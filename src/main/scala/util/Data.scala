@@ -1,10 +1,10 @@
-package adam
+package util
 
 import aiyou._
 import cats.data._
 import org.atnos.eff._
 
-object Util {
+object Data {
 
   case class Config(minWordLen: Int, maxWordLen: Int, cheat: Boolean)
 

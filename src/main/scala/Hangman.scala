@@ -1,8 +1,8 @@
 package adam
 
-import adam.IOEffect._
-import adam.Terminals._
-import adam.Util._
+import util.IOEffect._
+import util.Terminals._
+import util.Data._
 import aiyou._
 import aiyou.implicits._
 import cats.implicits._
@@ -11,23 +11,20 @@ import org.atnos.eff.future._
 import org.atnos.eff.syntax.all._
 import org.atnos.eff.syntax.future._
 import org.atnos.eff.{ExecutorServices, _}
+import util.Terminals
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.io.{Source, StdIn}
+import scala.util.Random
 
 object Hangman extends App {
   implicit val scheduler = ExecutorServices.schedulerFromScheduledExecutorService(ExecutorServices.scheduledExecutor(10))
 
+  def randomNum(min: Int, max: Int): IO[Int] = IO.primitive(new Random().nextInt(max - min + 1) + min)
 
-  def readLine: IO[String] = IO.primitive(StdIn.readLine)
-
-  def readFile(file: String): IO[List[String]] = IO.primitive(Source.fromFile(file).getLines.toList)
-
-  def randomNum(min: Int, max: Int): IO[Int] = IO.primitive(new util.Random().nextInt(max - min + 1) + min)
-
-  def randomWord(len: Int): Future[String] = Future(List("hello", "world", "scala", "taiwan")(new util.Random().nextInt(4)))
+  def randomWord(len: Int): Future[String] = Future(List("hello", "world", "scala", "taiwan")(new Random().nextInt(4)))
 
   def randomWordEff[R: _config : _future : _io]: Eff[R, String] = {
     for {
@@ -38,53 +35,19 @@ object Hangman extends App {
     } yield word.toUpperCase
   }
 
-  def outputFile(col: Int, row: Int, file: String): IO[Unit] = {
-    for {
-      ls <- readFile(file)
-      _ <- ls.zipWithIndex.map({ case (l, i) => writeText(col, row + i, l) }).sequence
-    } yield ()
-  }
-
-  def outputImage(word: String, guesses: List[Char]): IO[Unit] =
-    outputFile(0, 8, s"${numMisses(word, guesses)}-miss.txt")
-
-  def outputStatus(word: String, guesses: List[Char]): IO[Unit] = {
-    for {
-      _ <- writeText(10, 9, makes(word, guesses))
-      _ <- writeText(10, 10, List.fill(word.size)('-').mkString(" "))
-      _ <- writeText(10, 12, s"Misses: ${misses(word, guesses)}")
-      _ <- calculateResult(word, guesses) match {
-        case Continue => IO.pure(())
-        case YouWin => writeText(10, 14, "You win!!\n")
-        case YouLose => writeText(10, 14, s"The word is $word.  You Lose.\n")
-      }
-    } yield ()
-  }
-
-  def makes(word: String, guesses: List[Char]): String =
-    word.flatMap(c => if (guesses.contains(c)) s"$c " else "  ")
-
-  def numMisses(word: String, guesses: List[Char]): Int =
-    guesses.filterNot(c => word.contains(c.toString)).size
-
-  def misses(word: String, guesses: List[Char]): String =
-    guesses.filterNot(c => word.contains(c.toString)).reverse.mkString(" ")
-
-  def calculateResult(word: String, guesses: List[Char]): Result = {
-    if (word.toSet == guesses.toSet.intersect(word.toSet)) YouWin
-    else if (numMisses(word, guesses) >= 6) YouLose
-    else Continue
+  def updateContext(key : Terminals.Key)(context : Context) : Context = {
+    context.copy(guesses = key.char.toUpper :: context.guesses)
   }
 
   def outputScreen[R: _config : _context : _io]: Eff[R, Unit] = {
     for {
-//      _ <- fromIO(clearScreen)
+      _ <- fromIO(clearScreen)
       context <- get[R, Context]
       Context(word, guesses) = context
-      _ <- fromIO(outputImage(word, guesses))
-      _ <- fromIO(outputStatus(word, guesses))
+      _ <- fromIO(Output.outputImage(word, guesses))
+      _ <- fromIO(Output.outputStatus(word, guesses))
       config <- ask[R, Config]
-//      _ <- if (config.cheat) fromIO(writeText(0, 20, word)) else Eff.pure[R, Unit](())
+      _ <- if (config.cheat) fromIO(writeText(0, 20, word)) else Eff.pure[R, Unit](())
     } yield ()
   }
 
@@ -92,12 +55,9 @@ object Hangman extends App {
     for {
       _ <- outputScreen
       key <- fromIO(readKey)
+      _ <- modify(updateContext(key))
       context <- get[R, Context]
-      _ <- fromIO(writeText(0, 20, context.toString))
-      _ <- put[R, Context](context.copy(guesses = key.char.toUpper :: context.guesses))
-      context2 <- get[R, Context]
-      Context(word, guesses) = context2
-      _ <- calculateResult(word, guesses) match {
+      _ <- Output.calculateResult(context.word, context.guesses) match {
         case Continue => gameLoop
         case YouWin | YouLose => Eff.pure[R, Unit](())
       }

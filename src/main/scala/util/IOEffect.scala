@@ -1,4 +1,4 @@
-package adam
+package util
 
 import aiyou._
 import cats._
