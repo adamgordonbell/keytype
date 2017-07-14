@@ -8,7 +8,24 @@ object Data {
 
   case class Config(minWordLen: Int, maxWordLen: Int, cheat: Boolean)
 
-  case class Context(word: String, guesses: List[Char])
+  case class Context(word: String, guesses: Set[Char]){
+
+    def calculateResult(): Result = {
+      if (word.toSet == guesses.intersect(word.toSet)) {
+        YouWin
+      } else if (numMisses >= 6) {
+        YouLose
+      } else {
+        Continue
+      }
+    }
+
+    def numMisses(): Int = guesses.filterNot(c => word.contains(c.toString)).size
+
+    def misses(): String =
+      guesses.filterNot(c => word.contains(c.toString)).seq.toList.reverse.mkString(" ")
+
+  }
 
   trait Result
   case object Continue extends Result

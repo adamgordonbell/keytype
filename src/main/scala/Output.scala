@@ -21,24 +21,8 @@ import scala.util.Random
 
 object Output {
 
-  def makes(word: String, guesses: List[Char]): String =
+  def makes(word: String, guesses: Set[Char]): String =
     word.flatMap(c => if (guesses.contains(c)) s"$c " else "  ")
-
-  def numMisses(word: String, guesses: List[Char]): Int =
-    guesses.filterNot(c => word.contains(c.toString)).size
-
-  def misses(word: String, guesses: List[Char]): String =
-    guesses.filterNot(c => word.contains(c.toString)).reverse.mkString(" ")
-
-  def calculateResult(word: String, guesses: List[Char]): Result = {
-    if (word.toSet == guesses.toSet.intersect(word.toSet)) {
-      YouWin
-    } else if (numMisses(word, guesses) >= 6) {
-      YouLose
-    } else {
-      Continue
-    }
-  }
 
   def readLine: IO[String] = IO.primitive(StdIn.readLine)
 
@@ -51,18 +35,18 @@ object Output {
     } yield ()
   }
 
-  def outputImage(word: String, guesses: List[Char]): IO[Unit] =
-    outputFile(0, 8, s"${numMisses(word, guesses)}-miss.txt")
+  def outputImage(context: Context): IO[Unit] =
+    outputFile(0, 8, s"${context.numMisses}-miss.txt")
 
-  def outputStatus(word: String, guesses: List[Char]): IO[Unit] = {
+  def outputStatus(context : Context): IO[Unit] = {
     for {
-      _ <- writeText(10, 9, makes(word, guesses))
-      _ <- writeText(10, 10, List.fill(word.size)('-').mkString(" "))
-      _ <- writeText(10, 12, s"Misses: ${misses(word, guesses)}")
-      _ <- calculateResult(word, guesses) match {
+      _ <- writeText(10, 9, makes(context.word, context.guesses))
+      _ <- writeText(10, 10, List.fill(context.word.size)('-').mkString(" "))
+      _ <- writeText(10, 12, s"Misses: ${context.misses}")
+      _ <- context.calculateResult match {
         case Continue => IO.pure(())
         case YouWin => writeText(10, 14, "You win!!\n")
-        case YouLose => writeText(10, 14, s"The word is $word.  You Lose.\n")
+        case YouLose => writeText(10, 14, s"The word is ${context.word}.  You Lose.\n")
       }
     } yield ()
   }

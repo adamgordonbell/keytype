@@ -36,18 +36,17 @@ object Hangman extends App {
   }
 
   def updateContext(key : Terminals.Key)(context : Context) : Context = {
-    context.copy(guesses = key.char.toUpper :: context.guesses)
+    context.copy(guesses = context.guesses + key.char.toUpper)
   }
 
   def outputScreen[R: _config : _context : _io]: Eff[R, Unit] = {
     for {
       _ <- fromIO(clearScreen)
       context <- get[R, Context]
-      Context(word, guesses) = context
-      _ <- fromIO(Output.outputImage(word, guesses))
-      _ <- fromIO(Output.outputStatus(word, guesses))
+      _ <- fromIO(Output.outputImage(context))
+      _ <- fromIO(Output.outputStatus(context))
       config <- ask[R, Config]
-      _ <- if (config.cheat) fromIO(writeText(0, 20, word)) else Eff.pure[R, Unit](())
+      _ <- if (config.cheat) fromIO(writeText(0, 20, context.word)) else Eff.pure[R, Unit](())
     } yield ()
   }
 
@@ -57,7 +56,7 @@ object Hangman extends App {
       key <- fromIO(readKey)
       _ <- modify(updateContext(key))
       context <- get[R, Context]
-      _ <- Output.calculateResult(context.word, context.guesses) match {
+      _ <- context.calculateResult() match {
         case Continue => gameLoop
         case YouWin | YouLose => Eff.pure[R, Unit](())
       }
@@ -67,7 +66,7 @@ object Hangman extends App {
   def startGame[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
       word <- randomWordEff
-      _ <- put[R, Context](Context(word, List()))
+      _ <- put[R, Context](Context(word, Set.empty))
       result <- gameLoop
       _ <- outputScreen
     } yield ()
@@ -76,7 +75,7 @@ object Hangman extends App {
   Await.result(
     startGame[Stack]
       .runReader(Config(5, 10, false))
-      .runState(Context("", List()))
+      .runState(Context("", Set.empty))
       .runIO
       .runSequential,
     Duration.Inf)
