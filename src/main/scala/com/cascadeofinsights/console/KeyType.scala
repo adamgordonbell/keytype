@@ -34,7 +34,7 @@ object KeyType extends App {
   def startGame[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
       word <- Input.randomWord
-      _ <- put[R, Context](Context(word, Set.empty))
+      _ <- put[R, Context](Context(word, Seq.empty))
       result <- gameLoop
       _ <- Output.outputScreen
     } yield ()
@@ -43,7 +43,7 @@ object KeyType extends App {
   Await.result(
     startGame[Stack]
       .runReader(Config())
-      .runState(Context("", Set.empty))
+      .runState(Context("", Seq.empty))
       .runIO
       .runSequential,
     Duration.Inf)
