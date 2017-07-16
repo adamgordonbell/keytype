@@ -24,10 +24,7 @@ object KeyType extends App {
       key <- fromIO(readKey)
       _ <- modify(Context.update(key))
       context <- get[R, Context]
-      _ <- context.calculateResult() match {
-        case Continue => gameLoop
-        case YouWin | YouLose => Eff.pure[R, Unit](())
-      }
+      _ <- gameLoop // unless we are done
     } yield ()
   }
 

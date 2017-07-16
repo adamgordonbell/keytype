@@ -13,28 +13,16 @@ import scala.io.Source
 
 object Output {
 
-  private def makes(word: String, guesses: Seq[Char]): String =
-    word.flatMap(c => if (guesses.contains(c)) s"$c " else "  ")
-
-  private def readFile(file: String): IO[List[String]] = IO.primitive(Source.fromFile(file).getLines.toList)
-
-  private def outputFile(col: Int, row: Int, file: String): IO[Unit] = {
-    for {
-      ls <- readFile(file)
-      _ <- ls.zipWithIndex.map({ case (l, i) => writeText(col, row + i, l) }).sequence
-    } yield ()
-  }
-
   def outputImage(context: Context): IO[Unit] = {
     outputFile(0, 0, s"header.txt")
   }
 
   def outputStatus(context : Context): IO[Unit] = {
     for {
-      _ <- writeText(0, 25, "Text:")
-      _ <- writeText(0, 27, "the big fox jumps over the red thingy")
-      _ <- writeText(0, 28, "You:")
-      _ <- writeText(0, 30, "___ ___")
+      _ <- writeText(0, 14, "Text:")
+      _ <- writeText(0, 16, "the big fox jumps over the red thingy")
+      _ <- writeText(0, 20, "You:")
+      _ <- writeText(0, 22, "___ ___")
     } yield ()
   }
 
