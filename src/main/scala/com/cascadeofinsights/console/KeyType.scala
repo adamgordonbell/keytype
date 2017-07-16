@@ -42,7 +42,7 @@ object KeyType extends App {
 
   Await.result(
     startGame[Stack]
-      .runReader(Config(5, 10, false))
+      .runReader(Config())
       .runState(Context("", Set.empty))
       .runIO
       .runSequential,

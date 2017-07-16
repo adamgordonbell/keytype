@@ -6,7 +6,7 @@ import org.atnos.eff._
 
 object Data {
 
-  case class Config(minWordLen: Int, maxWordLen: Int, cheat: Boolean)
+  case class Config()
 
   case class Context(word: String, guesses: Set[Char]){
 
