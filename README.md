@@ -1,1 +1,1 @@
-# Example code for Scala Taiwan #16
+# Typing 

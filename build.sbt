@@ -1,4 +1,4 @@
-name := "scala-taiwan-16"
+name := "keytype"
 version := "0.0.1-SNAPSHOT"
 scalaVersion := "2.12.1"
 scalaOrganization in ThisBuild := "org.typelevel"
@@ -12,7 +12,6 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "cats" % "0.9.0",
   "org.atnos" %% "eff" % "4.3.1",
   "io.github.adelbertc" %% "aiyou-core-cats" % "0.1.0-SNAPSHOT",
-  "com.github.mpilquist" %% "simulacrum" % "0.10.0",
   "com.googlecode.lanterna" % "lanterna" % "3.0.0-rc1"
 )
 

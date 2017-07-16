@@ -1,4 +1,4 @@
-package util
+package com.cascadeofinsights.lib.util
 
 import aiyou._
 import cats.data._
@@ -25,6 +25,12 @@ object Data {
     def misses(): String =
       guesses.filterNot(c => word.contains(c.toString)).seq.toList.reverse.mkString(" ")
 
+  }
+  object Context {
+
+    def update(key : Terminals.Key)(context : Context) : Context = {
+      context.copy(guesses = context.guesses + key.char.toUpper)
+    }
   }
 
   trait Result

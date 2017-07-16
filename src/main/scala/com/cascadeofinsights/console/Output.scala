@@ -1,34 +1,24 @@
-package adam
+package com.cascadeofinsights.console
 
 import aiyou._
 import aiyou.implicits._
 import cats.implicits._
+import org.atnos.eff._
 import org.atnos.eff.all._
-import org.atnos.eff.future._
-import org.atnos.eff.syntax.all._
-import org.atnos.eff.syntax.future._
-import org.atnos.eff.{ExecutorServices, _}
-import util.Data._
-import util.IOEffect._
-import util.Terminals
-import util.Terminals._
+import com.cascadeofinsights.lib.util.Data._
+import com.cascadeofinsights.lib.util.IOEffect._
+import com.cascadeofinsights.lib.util.Terminals._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
-import scala.io.{Source, StdIn}
-import scala.util.Random
+import scala.io.Source
 
 object Output {
 
-  def makes(word: String, guesses: Set[Char]): String =
+  private def makes(word: String, guesses: Set[Char]): String =
     word.flatMap(c => if (guesses.contains(c)) s"$c " else "  ")
 
-  def readLine: IO[String] = IO.primitive(StdIn.readLine)
+  private def readFile(file: String): IO[List[String]] = IO.primitive(Source.fromFile(file).getLines.toList)
 
-  def readFile(file: String): IO[List[String]] = IO.primitive(Source.fromFile(file).getLines.toList)
-
-  def outputFile(col: Int, row: Int, file: String): IO[Unit] = {
+  private def outputFile(col: Int, row: Int, file: String): IO[Unit] = {
     for {
       ls <- readFile(file)
       _ <- ls.zipWithIndex.map({ case (l, i) => writeText(col, row + i, l) }).sequence
@@ -48,6 +38,15 @@ object Output {
         case YouWin => writeText(10, 14, "You win!!\n")
         case YouLose => writeText(10, 14, s"The word is ${context.word}.  You Lose.\n")
       }
+    } yield ()
+  }
+
+  def outputScreen[R: _config : _context : _io]: Eff[R, Unit] = {
+    for {
+      _ <- fromIO(clearScreen)
+      context <- get[R, Context]
+      _ <- fromIO(Output.outputImage(context))
+      _ <- fromIO(Output.outputStatus(context))
     } yield ()
   }
 }

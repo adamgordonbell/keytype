@@ -1,4 +1,4 @@
-package util
+package com.cascadeofinsights.lib.util
 
 import aiyou._
 import com.googlecode.lanterna.input._
