@@ -8,27 +8,28 @@ object Data {
 
   case class Config()
 
-  case class Context2(text : Text, results : Seq[Result])
-  case class Context(word: String, guesses: Seq[Char]){
-
-    def calculateResult(): Result = ???
-
-    def numMisses(): Int = ???
-
-    def misses(): String = ???
-
+  object Config {
+    def empty() = Config()
   }
-  object Context {
 
-    def update(key : Terminals.Key)(context : Context) : Context = {
-      context.copy(guesses = context.guesses :+ key.char)
+  case class Context(text : Text, keys : Seq[Key])
+
+  object Context{
+    def update(key : Key)(context : Context) : Context = {
+      context.copy(keys = context.keys :+ key)
+    }
+    def empty() : Context = {
+      Context(Text.create(""), Seq.empty)
+    }
+    def create(text : Text) : Context = {
+      Context(text, Seq.empty)
     }
   }
 
-  trait Result
-  case object Continue extends Result
-  case object YouWin extends Result
-  case object YouLose extends Result
+  trait Status
+  case object Exit extends Status
+  case object InProgress extends Status
+  case object Done extends Status
 
   type ConfigReader[A] = Reader[Config, A]
 

@@ -10,6 +10,7 @@ import org.atnos.eff.{ExecutorServices, _}
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
+import com.cascadeofinsights.lib.util.TypingImp
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,8 +31,8 @@ object KeyType extends App {
 
   def startGame[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
-      word <- Input.randomWord
-      _ <- put[R, Context](Context(word, Seq.empty))
+      word <- fromFuture(TypingImp.nextText())
+      _ <- put[R, Context](Context.create(word))
       result <- gameLoop
       _ <- Output.outputScreen
     } yield ()
@@ -39,8 +40,8 @@ object KeyType extends App {
 
   Await.result(
     startGame[Stack]
-      .runReader(Config())
-      .runState(Context("", Seq.empty))
+      .runReader(Config.empty)
+      .runState(Context.empty)
       .runIO
       .runSequential,
     Duration.Inf)

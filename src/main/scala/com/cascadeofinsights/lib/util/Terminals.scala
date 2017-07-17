@@ -11,7 +11,6 @@ import scala.io.Source
 object Terminals {
   private val terminal = new DefaultTerminalFactory().createTerminal
 
-  case class Key(char: Char)
 
   def clearScreen: IO[Unit] = IO.primitive(terminal.clearScreen)
 
@@ -20,7 +19,7 @@ object Terminals {
       val k = terminal.readInput
       if (k.getKeyType == KeyType.Character) k.getCharacter else readChar
     }
-    Key(readChar)
+    Key.create(readChar)
   }
 
   def writeText(col: Int, row: Int, text: String): IO[Unit] = IO primitive {

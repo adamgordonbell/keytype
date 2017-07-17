@@ -1,17 +1,19 @@
 package com.cascadeofinsights.lib.util
 
-import java.time.Duration
-import java.time._
+import java.time.{Duration, _}
 import java.util.UUID
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-import aiyou._
-import cats.data._
-import org.atnos.eff._
+case class Key(char: Char, zonedDateTime: ZonedDateTime)
 
+object Key {
+  def create(char : Char): Key = Key(char, ZonedDateTime.now())
+}
 
 trait Typing[Text,Result] {
- def nextText() : Text
- def storeResult(result : Result) : Unit
+ def nextText() : Future[Text]
+ def storeResult(result : Result) : Future[Unit]
 }
 
 case class Result(id : UUID, expected : String, result : String, duration : Duration, date : ZonedDateTime){
@@ -21,6 +23,10 @@ case class Result(id : UUID, expected : String, result : String, duration : Dura
 object Result{
   def create(expected : String, result : String, duration : Duration, date : ZonedDateTime) = {
     Result(id = UUID.randomUUID(), expected, result, duration, date)
+  }
+  def create(expected : String, result : String, start : ZonedDateTime , end : ZonedDateTime): Result ={
+    val duration : Duration = Duration.between(start, end)
+    Result(id = UUID.randomUUID(), expected , result,duration, start)
   }
 }
 
@@ -32,7 +38,7 @@ object Text {
   }
 }
 object TypingImp extends Typing[Text,Result] {
-  override def nextText(): Text = Text.create("The red fox jumped over the brown dog")
+  override def nextText(): Future[Text] = Future(Text.create("The red fox jumped over the brown dog"))
 
-  override def storeResult(result: Result): Unit = {}
+  override def storeResult(result: Result): Future[Unit] = Future({})
 }
