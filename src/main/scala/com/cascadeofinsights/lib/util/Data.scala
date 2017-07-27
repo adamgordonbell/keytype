@@ -4,6 +4,8 @@ import aiyou._
 import cats.data._
 import org.atnos.eff._
 
+import scala.util.Try
+
 object Data {
 
   case class Config()
@@ -12,15 +14,26 @@ object Data {
     def empty() = Config()
   }
 
-  case class Context(text : Text, keys : Seq[Key])
+  case class Context(text : Text, keys : Seq[TypedKey])
+  {
+    def correctKeys(): Seq[TypedKey] = keys.filter(_.correct)
+
+    def result(): String = correctKeys()
+      .map(_.char)
+      .toList.mkString("")
+
+    def expectedKey : Option[Char] = Try(text.text.charAt(correctKeys().length)).toOption
+  }
 
   object Context{
     def update(key : Key)(context : Context) : Context = {
-      context.copy(keys = context.keys :+ key)
+      context.copy(keys = context.keys :+ TypedKey.create(key, context.expectedKey.getOrElse(' ')))
     }
+
     def empty() : Context = {
       Context(Text.create(""), Seq.empty)
     }
+
     def create(text : Text) : Context = {
       Context(text, Seq.empty)
     }

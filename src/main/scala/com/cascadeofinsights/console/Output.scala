@@ -20,9 +20,9 @@ object Output {
   def outputStatus(context : Context): IO[Unit] = {
     for {
       _ <- writeText(0, 14, "Text:")
-      _ <- writeText(0, 16, "the big fox jumps over the red thingy")
+      _ <- writeText(0, 16,  context.text.text)
       _ <- writeText(0, 20, "You:")
-      _ <- writeText(0, 22, "___ ___")
+      _ <- writeText(0, 22, context.result())
     } yield ()
   }
 

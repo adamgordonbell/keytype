@@ -25,15 +25,26 @@ object KeyType extends App {
       key <- fromIO(readKey)
       _ <- modify(Context.update(key))
       context <- get[R, Context]
-      _ <- gameLoop // unless we are done
+      _ <- maybeExit // unless we are done
     } yield ()
+  }
+
+  def maybeExit[R: _config : _context : _io]: Eff[R, Unit] = {
+//    for {
+//      context <- get[R, Context]
+//      _ <- context.keys.headOption match {
+//        case Some('w') => ???
+//        case _ => gameLoop
+//      }
+//    } yield ()
+    ???
   }
 
   def startGame[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
       word <- fromFuture(TypingImp.nextText())
       _ <- put[R, Context](Context.create(word))
-      result <- gameLoop
+      _ <- gameLoop
       _ <- Output.outputScreen
     } yield ()
   }

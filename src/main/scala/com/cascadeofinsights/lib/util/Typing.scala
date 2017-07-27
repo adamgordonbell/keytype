@@ -11,6 +11,12 @@ object Key {
   def create(char : Char): Key = Key(char, ZonedDateTime.now())
 }
 
+case class TypedKey(char: Char, zonedDateTime: ZonedDateTime, correct : Boolean)
+
+object TypedKey{
+  def create(key : Key, expectedKey : Char) = TypedKey(key.char, key.zonedDateTime, key.char == expectedKey)
+}
+
 trait Typing[Text,Result] {
  def nextText() : Future[Text]
  def storeResult(result : Result) : Future[Unit]
