@@ -22,6 +22,10 @@ object Data {
       .map(_.char)
       .toList.mkString("")
 
+    val lastkey: Option[TypedKey] = keys.lastOption
+
+    val complete = text.text == result()
+
     def expectedKey : Option[Char] = Try(text.text.charAt(correctKeys().length)).toOption
   }
 

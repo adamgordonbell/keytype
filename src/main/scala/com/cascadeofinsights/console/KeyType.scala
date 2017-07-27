@@ -1,16 +1,14 @@
 package com.cascadeofinsights.console
 
-import Output._
-import cats.implicits._
+import com.cascadeofinsights.lib.util.Data._
+import com.cascadeofinsights.lib.util.IOEffect._
+import com.cascadeofinsights.lib.util.Terminals._
+import com.cascadeofinsights.lib.util.{TypedKey, TypingImp}
 import org.atnos.eff.all._
 import org.atnos.eff.future._
 import org.atnos.eff.syntax.all._
 import org.atnos.eff.syntax.future._
 import org.atnos.eff.{ExecutorServices, _}
-import com.cascadeofinsights.lib.util.Data._
-import com.cascadeofinsights.lib.util.IOEffect._
-import com.cascadeofinsights.lib.util.Terminals._
-import com.cascadeofinsights.lib.util.TypingImp
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,14 +28,14 @@ object KeyType extends App {
   }
 
   def maybeExit[R: _config : _context : _io]: Eff[R, Unit] = {
-//    for {
-//      context <- get[R, Context]
-//      _ <- context.keys.headOption match {
-//        case Some('w') => ???
-//        case _ => gameLoop
-//      }
-//    } yield ()
-    ???
+    for {
+      context <- get[R, Context]
+      _ <- (context.complete, context.lastkey) match {
+        case (true,_) => Eff.pure[R, Unit](())
+        case (_,Some(TypedKey('z', _ ,_))) => Eff.pure[R, Unit](())
+        case _ => gameLoop
+      }
+    } yield ()
   }
 
   def startGame[R: _config : _context : _future : _io]: Eff[R, Unit] = {

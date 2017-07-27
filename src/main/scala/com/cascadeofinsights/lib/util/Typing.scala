@@ -44,7 +44,7 @@ object Text {
   }
 }
 object TypingImp extends Typing[Text,Result] {
-  override def nextText(): Future[Text] = Future(Text.create("The red fox jumped over the brown dog"))
+  override def nextText(): Future[Text] = Future(Text.create("The red fox jumped over the brown dogzz".filterNot(_ == 'z')))
 
   override def storeResult(result: Result): Future[Unit] = Future({})
 }

@@ -1,21 +1,18 @@
 package com.cascadeofinsights.console
 
 import aiyou._
-import aiyou.implicits._
-import cats.implicits._
-import org.atnos.eff._
-import org.atnos.eff.all._
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
-
-import scala.io.Source
+import org.atnos.eff._
+import org.atnos.eff.all._
 
 object Output {
 
-  def outputImage(context: Context): IO[Unit] = {
-    outputFile(0, 0, s"header.txt")
-  }
+  def outputImage(context: Context): IO[Unit] = for {
+    _ <- outputFile(0, 0, s"header.txt")
+    _ <- writeText(0, 13, s"z = exit")
+  } yield ()
 
   def outputStatus(context : Context): IO[Unit] = {
     for {
