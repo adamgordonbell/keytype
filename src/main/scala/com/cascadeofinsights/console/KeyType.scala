@@ -17,35 +17,46 @@ import scala.concurrent.duration._
 object KeyType extends App {
   implicit val scheduler = ExecutorServices.schedulerFromScheduledExecutorService(ExecutorServices.scheduledExecutor(10))
 
-  def gameLoop[R: _config : _context : _io]: Eff[R, Unit] = {
+  def startGame[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
-      _ <- Output.outputScreen
-      key <- fromIO(readKey)
-      _ <- modify(Context.update(key))
-      context <- get[R, Context]
-      _ <- maybeExit // unless we are done
+      word <- fromIO(TypingImp.nextText())
+      _ <- put[R, Context](Context.create(word))
+      _ <- Output.initialScreen
+      _ <- gameLoop
     } yield ()
   }
 
-  def maybeExit[R: _config : _context : _io]: Eff[R, Unit] = {
+  def gameLoop[R: _config : _context : _future : _io]: Eff[R, Unit] = {
+    for {
+      key <- fromIO(readKey)
+      _ <- modify(Context.update(key))
+      _ <- Output.outputScreen
+      _ <- maybeExit
+    } yield ()
+  }
+
+  private def maybeExit[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
       context <- get[R, Context]
       _ <- (context.complete, context.lastkey) match {
-        case (true,_) => Eff.pure[R, Unit](())
-        case (_,Some(TypedKey('z', _ ,_))) => Eff.pure[R, Unit](())
+        case (true,_) => results
+        case (_,Some(TypedKey('.', _ ,_))) => results
         case _ => gameLoop
       }
     } yield ()
   }
 
-  def startGame[R: _config : _context : _future : _io]: Eff[R, Unit] = {
+  private def results[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
-      word <- fromFuture(TypingImp.nextText())
-      _ <- put[R, Context](Context.create(word))
-      _ <- gameLoop
-      _ <- Output.outputScreen
+      context <- get[R, Context]
+      result = context.toResult()
+      _ <- fromIO(writeText(0,30,s"wpm:${result.wpm}"))
+      _ <- fromIO(TypingImp.storeResult(result))
+      _ <- exit
     } yield ()
   }
+
+  private def exit[R: _config : _context : _io] = Eff.pure[R, Unit](())
 
   Await.result(
     startGame[Stack]

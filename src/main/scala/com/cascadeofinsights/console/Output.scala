@@ -11,7 +11,7 @@ object Output {
 
   def outputImage(context: Context): IO[Unit] = for {
     _ <- outputFile(0, 0, s"header.txt")
-    _ <- writeText(0, 13, s"z = exit")
+    _ <- writeText(0, 13, s". = exit")
   } yield ()
 
   def outputStatus(context : Context): IO[Unit] = {
@@ -22,6 +22,8 @@ object Output {
       _ <- writeText(0, 22, context.result())
     } yield ()
   }
+
+  def initialScreen[R: _config : _context : _io]: Eff[R, Unit]= outputScreen
 
   def outputScreen[R: _config : _context : _io]: Eff[R, Unit] = {
     for {

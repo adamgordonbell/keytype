@@ -2,8 +2,12 @@ package com.cascadeofinsights.lib.util
 
 import java.time.{Duration, _}
 import java.util.UUID
-import scala.concurrent.Future
+
+import aiyou.IO
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.Source
+import scala.util.Random
 
 case class Key(char: Char, zonedDateTime: ZonedDateTime)
 
@@ -18,12 +22,12 @@ object TypedKey{
 }
 
 trait Typing[Text,Result] {
- def nextText() : Future[Text]
- def storeResult(result : Result) : Future[Unit]
+ def nextText() : IO[Text]
+ def storeResult(result : Result) : IO[Unit]
 }
 
 case class Result(id : UUID, expected : String, result : String, duration : Duration, date : ZonedDateTime){
-  def wpm() : Double = 50
+  def wpm : Double = (result.length.toDouble / duration.toMillis) * 60 * 1000 / 5
 }
 
 object Result{
@@ -43,8 +47,23 @@ object Text {
     Text(id = UUID.randomUUID(),text)
   }
 }
-object TypingImp extends Typing[Text,Result] {
-  override def nextText(): Future[Text] = Future(Text.create("The red fox jumped over the brown dogzz".filterNot(_ == 'z')))
 
-  override def storeResult(result: Result): Future[Unit] = Future({})
+object TypingImp extends Typing[Text,Result] {
+  lazy val lines = {
+    val file = "paragrams.txt"
+    IO.primitive(Source.fromFile(file).getLines.toList)
+  }
+
+  override def nextText(): IO[Text] ={
+    lines.map{ls =>
+      Text.create(
+        Random.shuffle(ls)
+        .head
+        .filterNot(_ == '.')
+         + "."
+      )
+    }
+  }
+
+  override def storeResult(result: Result): IO[Unit] = IO.pure({})
 }

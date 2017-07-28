@@ -16,6 +16,9 @@ object Data {
 
   case class Context(text : Text, keys : Seq[TypedKey])
   {
+    //ToDo: make total
+    def toResult() = Result.create(text.text,result(),keys.head.zonedDateTime,keys.last.zonedDateTime)
+
     def correctKeys(): Seq[TypedKey] = keys.filter(_.correct)
 
     def result(): String = correctKeys()
@@ -27,6 +30,7 @@ object Data {
     val complete = text.text == result()
 
     def expectedKey : Option[Char] = Try(text.text.charAt(correctKeys().length)).toOption
+
   }
 
   object Context{
