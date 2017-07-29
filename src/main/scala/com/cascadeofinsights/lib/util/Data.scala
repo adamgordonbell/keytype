@@ -2,6 +2,7 @@ package com.cascadeofinsights.lib.util
 
 import aiyou._
 import cats.data._
+import com.cascadeofinsights.lib.core.{Key, Result, Text, TypedKey}
 import org.atnos.eff._
 
 import scala.util.Try

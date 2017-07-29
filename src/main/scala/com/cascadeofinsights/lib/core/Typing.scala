@@ -1,4 +1,4 @@
-package com.cascadeofinsights.lib.util
+package com.cascadeofinsights.lib.core
 
 import java.time.{Duration, _}
 import java.util.UUID

@@ -3,6 +3,7 @@ package com.cascadeofinsights.lib.util
 import aiyou._
 import aiyou.implicits._
 import cats.implicits._
+import com.cascadeofinsights.lib.core.Key
 import com.googlecode.lanterna.input._
 import com.googlecode.lanterna.terminal._
 

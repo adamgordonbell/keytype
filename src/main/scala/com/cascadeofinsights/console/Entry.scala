@@ -1,9 +1,9 @@
 package com.cascadeofinsights.console
 
+import com.cascadeofinsights.lib.core.TypingImp
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
-import com.cascadeofinsights.lib.util.TypingImp
 import org.atnos.eff._
 import org.atnos.eff.all._
 import org.atnos.eff.future._

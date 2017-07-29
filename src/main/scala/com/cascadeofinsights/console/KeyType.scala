@@ -1,8 +1,8 @@
 package com.cascadeofinsights.console
 
+import com.cascadeofinsights.lib.core.Key
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
-import com.cascadeofinsights.lib.util.Key
 import com.cascadeofinsights.lib.util.Terminals._
 import org.atnos.eff.future._
 import org.atnos.eff.syntax.all._
