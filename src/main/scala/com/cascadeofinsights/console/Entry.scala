@@ -25,7 +25,7 @@ object Entry {
     for {
       key <- fromIO(readKey)
       _ <- modify(Context.update(key))
-      _ <- Output.update
+      _ <- Output.updateTypingArea
       _ <- maybeDone
     } yield ()
   }
@@ -45,7 +45,7 @@ object Entry {
     for {
       context <- get[R, Context]
       result = context.toResult()
-      _ <- fromIO(writeText(0,30,s"wpm:${result.wpm}"))
+//      _ <- fromIO(writeText(0,30,s"wpm:${result.wpm}"))
       _ <- fromIO(TypingImp.storeResult(result))
       _ <- exit
     } yield ()

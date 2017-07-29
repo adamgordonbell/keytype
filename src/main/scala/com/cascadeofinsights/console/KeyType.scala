@@ -19,6 +19,7 @@ object KeyType extends App {
   def loop[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
       _ <- Entry.start
+      _ <- fromIO(Output.stats())
       _ <- fromIO(writeText(0,32,s"press space (esc exits)"))
       key <- fromIO(readKey)
       _ <- maybeExit(key)

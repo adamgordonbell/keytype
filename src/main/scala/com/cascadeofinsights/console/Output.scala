@@ -1,7 +1,7 @@
 package com.cascadeofinsights.console
 
 import aiyou._
-import com.cascadeofinsights.lib.core.{Character, TypedKey}
+import com.cascadeofinsights.lib.core.{Character, TypedKey, TypingImp}
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
@@ -10,11 +10,17 @@ import org.atnos.eff.all._
 
 object Output {
 
-  def outputImage(context: Context): IO[Unit] = for {
-    _ <- outputFile(0, 0, s"header.txt")
-  } yield ()
+  def initialScreen[R: _config : _context : _io]: Eff[R, Unit]= {
+    for {
+      context <- get[R, Context]
+      _ <- fromIO(clearScreen)
+      _ <- fromIO(Output.header(context))
+      _ <- fromIO(Output.stats())
+      _ <- fromIO(Output.typeArea(context))
+    } yield ()
+  }
 
-  def outputStatus(context : Context): IO[Unit] = {
+  private def typeArea(context : Context): IO[Unit] = {
     for {
       _ <- writeText(0, 14, "Text:")
       _ <- writeText(0, 16,  context.text.text)
@@ -23,16 +29,18 @@ object Output {
     } yield ()
   }
 
-  def initialScreen[R: _config : _context : _io]: Eff[R, Unit]= {
-    for {
-      context <- get[R, Context]
-      _ <- fromIO(clearScreen)
-      _ <- fromIO(Output.outputImage(context))
-      _ <- fromIO(Output.outputStatus(context))
-    } yield ()
+  private def header(context: Context): IO[Unit] = for {
+    _ <- outputFile(0, 0, s"header.txt")
+  } yield ()
+
+  def stats(): IO[Unit] = IO.pure{
+    val recent = TypingImp.results.take(3).zipWithIndex
+    for((r,i) <- recent){
+      writeText(0,11+i,s"WPM $i : ${r.wpm}").unsafePerformIO() //ToDo no unsafe
+    }
   }
 
-  def update[R: _config : _context : _io]: Eff[R, Unit] = {
+  def updateTypingArea[R: _config : _context : _io]: Eff[R, Unit] = {
     def outputDiff(context : Context): IO[Unit] = {
       val offset = context.correctKeys().length - 1
       val key = context.lastkey.get
