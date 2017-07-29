@@ -1,6 +1,6 @@
 package com.cascadeofinsights.console
 
-import com.cascadeofinsights.lib.core.Key
+import com.cascadeofinsights.lib.core.{Escape, Key}
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
@@ -19,7 +19,7 @@ object KeyType extends App {
   def loop[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
       _ <- Entry.start
-      _ <- fromIO(writeText(0,32,s"press space (? exits)"))
+      _ <- fromIO(writeText(0,32,s"press space (esc exits)"))
       key <- fromIO(readKey)
       _ <- maybeExit(key)
     } yield ()
@@ -28,7 +28,7 @@ object KeyType extends App {
   private def maybeExit[R: _config : _context : _future : _io](key : Key): Eff[R, Unit] = {
     for {
       _ <- key match {
-        case Key('?',_) => exit
+        case Key(Escape,_) => exit
         case _ => loop
       }
     } yield ()

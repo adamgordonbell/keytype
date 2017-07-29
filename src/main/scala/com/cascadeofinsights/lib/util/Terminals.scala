@@ -3,7 +3,7 @@ package com.cascadeofinsights.lib.util
 import aiyou._
 import aiyou.implicits._
 import cats.implicits._
-import com.cascadeofinsights.lib.core.Key
+import com.cascadeofinsights.lib.core._
 import com.googlecode.lanterna.input._
 import com.googlecode.lanterna.terminal._
 
@@ -18,11 +18,16 @@ object Terminals {
   def beep : IO[Unit] = IO.primitive(terminal.bell())
 
   def readKey: IO[Key] = IO primitive {
-    def readChar: Char = {
+    def readChar: Key = {
       val k = terminal.readInput
-      if (k.getKeyType == KeyType.Character) k.getCharacter else readChar
+      k.getKeyType match {
+        case KeyType.Character => Key.create(k.getCharacter)
+        case KeyType.Backspace =>  Key.createBackspace()
+        case KeyType.Escape => Key.createEscape()
+        case _ => readChar
+      }
     }
-    Key.create(readChar)
+    readChar
   }
 
   def writeText(col: Int, row: Int, text: String): IO[Unit] = IO primitive {

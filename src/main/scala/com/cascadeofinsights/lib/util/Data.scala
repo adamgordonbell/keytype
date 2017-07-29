@@ -2,7 +2,7 @@ package com.cascadeofinsights.lib.util
 
 import aiyou._
 import cats.data._
-import com.cascadeofinsights.lib.core.{Key, Result, Text, TypedKey}
+import com.cascadeofinsights.lib.core._
 import org.atnos.eff._
 
 import scala.util.Try
@@ -22,9 +22,7 @@ object Data {
 
     def correctKeys(): Seq[TypedKey] = keys.filter(_.correct)
 
-    def result(): String = correctKeys()
-      .map(_.char)
-      .toList.mkString("")
+    def result(): String = correctKeys().collect{case TypedKey(Character(c), _,_) => c}.toList.mkString("")
 
     val lastkey: Option[TypedKey] = keys.lastOption
 

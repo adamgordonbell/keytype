@@ -1,6 +1,6 @@
 package com.cascadeofinsights.console
 
-import com.cascadeofinsights.lib.core.TypingImp
+import com.cascadeofinsights.lib.core.{Escape, TypedKey, TypingImp}
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
@@ -35,6 +35,7 @@ object Entry {
       context <- get[R, Context]
       _ <- (context.complete, context.lastkey) match {
         case (true,_) => results
+        case (false,Some(TypedKey(Escape,_,_))) => results
         case _ => loop
       }
     } yield ()

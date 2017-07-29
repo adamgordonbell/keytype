@@ -1,6 +1,7 @@
 package com.cascadeofinsights.console
 
 import aiyou._
+import com.cascadeofinsights.lib.core.{Character, TypedKey}
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
@@ -35,10 +36,12 @@ object Output {
     def outputDiff(context : Context): IO[Unit] = {
       val offset = context.correctKeys().length - 1
       val key = context.lastkey.get
-      if(key.correct) {
-        writeText(offset, 22, key.char.toString)
-      } else {
-        IO.pure(beep)
+      key match {
+        case TypedKey(Character(x), _, true) =>
+          writeText(offset, 22, x.toString)
+        case TypedKey(Character(x),_, false) =>
+            IO.pure(beep)
+        case _ => IO.pure(())
       }
     }
     for {
