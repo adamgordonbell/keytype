@@ -11,7 +11,6 @@ object Output {
 
   def outputImage(context: Context): IO[Unit] = for {
     _ <- outputFile(0, 0, s"header.txt")
-    _ <- writeText(0, 13, s". = exit")
   } yield ()
 
   def outputStatus(context : Context): IO[Unit] = {
@@ -23,14 +22,28 @@ object Output {
     } yield ()
   }
 
-  def initialScreen[R: _config : _context : _io]: Eff[R, Unit]= outputScreen
-
-  def outputScreen[R: _config : _context : _io]: Eff[R, Unit] = {
+  def initialScreen[R: _config : _context : _io]: Eff[R, Unit]= {
     for {
-      _ <- fromIO(clearScreen)
       context <- get[R, Context]
+      _ <- fromIO(clearScreen)
       _ <- fromIO(Output.outputImage(context))
       _ <- fromIO(Output.outputStatus(context))
+    } yield ()
+  }
+
+  def update[R: _config : _context : _io]: Eff[R, Unit] = {
+    def outputDiff(context : Context): IO[Unit] = {
+      val offset = context.correctKeys().length - 1
+      val key = context.lastkey.get
+      if(key.correct) {
+        writeText(offset, 22, key.char.toString)
+      } else {
+        IO.pure(beep)
+      }
+    }
+    for {
+      context <- get[R, Context]
+      _ <- fromIO(outputDiff(context))
     } yield ()
   }
 }

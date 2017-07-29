@@ -14,6 +14,8 @@ object Terminals {
 
   def clearScreen: IO[Unit] = IO.primitive(terminal.clearScreen)
 
+  def beep : IO[Unit] = IO.primitive(terminal.bell())
+
   def readKey: IO[Key] = IO primitive {
     def readChar: Char = {
       val k = terminal.readInput

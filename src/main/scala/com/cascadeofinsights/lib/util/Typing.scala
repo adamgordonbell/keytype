@@ -59,8 +59,6 @@ object TypingImp extends Typing[Text,Result] {
       Text.create(
         Random.shuffle(ls)
         .head
-        .filterNot(_ == '.')
-         + "."
       )
     }
   }
