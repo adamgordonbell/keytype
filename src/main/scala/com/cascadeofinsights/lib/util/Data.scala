@@ -9,11 +9,11 @@ import scala.util.Try
 
 object Data {
 
-  case class Config()
+  case class Config(file : String)
 
-  object Config {
-    def empty() = Config()
-  }
+//  object Config {
+//    def empty() = Config()
+//  }
 
   case class Context(text : Text, keys : Seq[TypedKey])
   {
@@ -45,11 +45,6 @@ object Data {
       Context(text, Seq.empty)
     }
   }
-
-  trait Status
-  case object Exit extends Status
-  case object InProgress extends Status
-  case object Done extends Status
 
   type ConfigReader[A] = Reader[Config, A]
 

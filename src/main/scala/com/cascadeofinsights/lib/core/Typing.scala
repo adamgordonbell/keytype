@@ -15,12 +15,12 @@ trait Typing[Text,Result] {
 
 object TypingImp extends Typing[Text,Result] {
   lazy val lines = {
-    val file = "paragrams.txt"
+    val file = "txt/short/typeracer.txt"
     IO.primitive(Source.fromFile(file).getLines.toList)
   }
 
   override def nextText(): IO[Text] ={
-    lines.map{ls =>
+    lines.map{ ls =>
       Text.create(
         Random.shuffle(ls)
         .head

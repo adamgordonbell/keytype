@@ -38,7 +38,7 @@ object KeyType extends App {
 
   Await.result(
     loop[Stack]
-      .runReader(Config.empty)
+      .runReader(Config("txt/short/typeracer.txt"))
       .runState(Context.empty)
       .runIO
       .runSequential,
