@@ -15,11 +15,13 @@ sealed trait Input {
   def char():Char = {
     this match {
       case Character(char) =>  char
+      case Enter =>  '\n'
       case _ => ' '
     }
   }
 }
 case object Escape extends Input
+case object Enter extends Input
 case object Backspace extends Input
 case class Character(c : Char) extends Input
 
@@ -29,6 +31,7 @@ object Key {
   def createEscape(): Key = Key(Escape, ZonedDateTime.now())
   def create(c : Char): Key = Key(Character(c), ZonedDateTime.now())
   def createBackspace(): Key = Key(Backspace, ZonedDateTime.now())
+  def createEnter(): Key = Key(Enter, ZonedDateTime.now())
 }
 
 case class TypedKey(input: Input, zonedDateTime: ZonedDateTime, correct : Boolean)

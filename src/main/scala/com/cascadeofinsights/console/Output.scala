@@ -24,7 +24,7 @@ object Output {
     for {
       _ <- writeText(0, 14, "Text:")
       _ <- writeText(0, 16,  context.text.text)
-      _ <- writeText(0, 20, "You:")
+      _ <- writeText(0, 20, "You:(Esc exits)")
       _ <- writeText(0, 22, context.result())
     } yield ()
   }

@@ -20,7 +20,7 @@ object KeyType extends App {
     for {
       _ <- Entry.start
       _ <- fromIO(Output.stats())
-      _ <- fromIO(writeText(0,32,s"press space (esc exits)"))
+      _ <- fromIO(writeText(0,32,s"press enter (esc exits)"))
       key <- fromIO(readKey)
       _ <- maybeExit(key)
     } yield ()
