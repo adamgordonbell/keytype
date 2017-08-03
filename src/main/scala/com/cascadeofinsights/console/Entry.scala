@@ -1,6 +1,6 @@
 package com.cascadeofinsights.console
 
-import com.cascadeofinsights.lib.core.{Escape, TypedKey, TypingImp}
+import com.cascadeofinsights.lib.core.{Escape, TypedKey}
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
@@ -14,7 +14,8 @@ object Entry {
 
   def start[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
-      word <- fromIO(TypingImp.nextText())
+      config <- ask[R, Config]
+      word <- fromIO(config.typing.nextText())
       _ <- put[R, Context](Context.create(word))
       _ <- Output.initialScreen
       _ <- loop
@@ -45,7 +46,8 @@ object Entry {
     for {
       context <- get[R, Context]
       result = context.toResult()
-      _ <- fromIO(TypingImp.storeResult(result))
+      config <- ask[R, Config]
+      _ <- fromIO(config.typing.storeResult(result))
       _ <- exit
     } yield ()
   }

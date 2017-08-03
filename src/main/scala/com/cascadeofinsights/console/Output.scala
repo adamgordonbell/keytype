@@ -1,7 +1,7 @@
 package com.cascadeofinsights.console
 
 import aiyou._
-import com.cascadeofinsights.lib.core.{Character, TypedKey, TypingImp}
+import com.cascadeofinsights.lib.core.{Character, TypedKey}
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
@@ -13,9 +13,10 @@ object Output {
   def initialScreen[R: _config : _context : _io]: Eff[R, Unit]= {
     for {
       context <- get[R, Context]
+      config <- ask[R, Config]
       _ <- fromIO(clearScreen)
       _ <- fromIO(Output.header(context))
-      _ <- fromIO(Output.stats())
+      _ <- fromIO(Output.stats(config))
       _ <- fromIO(Output.typeArea(context))
     } yield ()
   }
@@ -33,8 +34,8 @@ object Output {
     _ <- outputFile(0, 0, s"header.txt")
   } yield ()
 
-  def stats(): IO[Unit] = IO.pure{
-    val recent = TypingImp.results.take(3).zipWithIndex
+  def stats(config : Config): IO[Unit] = IO.pure{
+    val recent = config.typing.results.take(3).zipWithIndex
     for((r,i) <- recent){
       writeText(0,11+i,s"WPM $i : ${r.wpm}").unsafePerformIO() //ToDo no unsafe
     }

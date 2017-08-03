@@ -13,9 +13,8 @@ trait Typing[Text,Result] {
 }
 
 
-object TypingImp extends Typing[Text,Result] {
+class TypingImp(file : String) extends Typing[Text,Result] {
   lazy val lines = {
-    val file = "txt/short/typeracer.txt"
     IO.primitive(Source.fromFile(file).getLines.toList)
   }
 

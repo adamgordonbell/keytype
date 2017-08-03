@@ -9,7 +9,9 @@ import scala.util.Try
 
 object Data {
 
-  case class Config(file : String)
+  case class Config(file : String){
+    val typing = new TypingImp(file)
+  }
 
 //  object Config {
 //    def empty() = Config()
@@ -55,4 +57,6 @@ object Data {
   type _config[R] = ConfigReader |= R
 
   type _context[R] = ContextState |= R
+
+//  type _stack[R] = ContextState |= ConfigReader |= TimedFuture |= IO |= R
 }

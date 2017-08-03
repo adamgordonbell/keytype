@@ -4,6 +4,7 @@ import com.cascadeofinsights.lib.core.{Escape, Key}
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
+import org.atnos.eff.all._
 import org.atnos.eff.future._
 import org.atnos.eff.syntax.all._
 import org.atnos.eff.syntax.future._
@@ -18,15 +19,16 @@ object KeyType extends App {
 
   def loop[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
+      config <- ask[R, Config]
       _ <- Entry.start
-      _ <- fromIO(Output.stats())
+      _ <- fromIO(Output.stats(config))
       _ <- fromIO(writeText(0,32,s"press enter (esc exits)"))
       key <- fromIO(readKey)
       _ <- maybeExit(key)
     } yield ()
   }
 
-  private def maybeExit[R: _config : _context : _future : _io](key : Key): Eff[R, Unit] = {
+  private def maybeExit[R: _config : _context : _future : _io ](key : Key): Eff[R, Unit] = {
     for {
       _ <- key match {
         case Key(Escape,_) => exit
@@ -34,7 +36,7 @@ object KeyType extends App {
       }
     } yield ()
   }
-  private def exit[R: _config : _context : _io] = Eff.pure[R, Unit](())
+  private def exit[R: _config : _context : _future : _io] = Eff.pure[R, Unit](())
 
   Await.result(
     loop[Stack]
