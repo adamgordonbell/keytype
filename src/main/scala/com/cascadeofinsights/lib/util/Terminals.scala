@@ -25,13 +25,13 @@ object Terminals {
 
   def beep : IO[Unit] = IO.primitive(terminal.bell())
 
-  def readKey: IO[Key] = IO primitive {
-    def readChar: Key = {
+  def readKey: IO[KeyPressEvent] = IO primitive {
+    def readChar: KeyPressEvent = {
       val k = terminal.readInput
       k.getKeyType match {
-        case KeyType.Character => Key.create(k.getCharacter)
-        case KeyType.Backspace =>  Key.createBackspace()
-        case KeyType.Escape => Key.createEscape()
+        case KeyType.Character => KeyPressEvent.create(k.getCharacter)
+        case KeyType.Backspace =>  KeyPressEvent.createBackspace()
+        case KeyType.Escape => KeyPressEvent.createEscape()
         case _ => readChar
       }
     }

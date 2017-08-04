@@ -17,7 +17,7 @@ object Entry {
       config <- ask[R, Config]
       word <- fromIO(config.typing.nextText())
       _ <- put[R, Context](Context.create(word))
-      _ <- Output.initialScreen
+      _ <- Output.initialEntryScreen
       _ <- loop
     } yield ()
   }
@@ -47,7 +47,7 @@ object Entry {
       context <- get[R, Context]
       result = context.toResult()
       config <- ask[R, Config]
-      _ <- fromIO(config.typing.storeResult(result))
+      _ <- fromIO(config.typing.storeResult(result.get))//Todo make total
       _ <- exit
     } yield ()
   }

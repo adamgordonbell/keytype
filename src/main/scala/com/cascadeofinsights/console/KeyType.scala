@@ -1,6 +1,6 @@
 package com.cascadeofinsights.console
 
-import com.cascadeofinsights.lib.core.{Escape, Key}
+import com.cascadeofinsights.lib.core.{Escape, KeyPressEvent}
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
@@ -28,10 +28,10 @@ object KeyType extends App {
     } yield ()
   }
 
-  private def maybeExit[R: _config : _context : _future : _io ](key : Key): Eff[R, Unit] = {
+  private def maybeExit[R: _config : _context : _future : _io ](key : KeyPressEvent): Eff[R, Unit] = {
     for {
       _ <- key match {
-        case Key(Escape,_) => exit
+        case KeyPressEvent(Escape,_) => exit
         case _ => loop
       }
     } yield ()

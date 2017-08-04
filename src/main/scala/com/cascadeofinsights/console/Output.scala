@@ -1,7 +1,7 @@
 package com.cascadeofinsights.console
 
 import aiyou._
-import com.cascadeofinsights.lib.core.{Character, TypedKey}
+import com.cascadeofinsights.lib.core.{Character, ScreenDrawEvent, TypedKey}
 import com.cascadeofinsights.lib.util.Data._
 import com.cascadeofinsights.lib.util.IOEffect._
 import com.cascadeofinsights.lib.util.Terminals._
@@ -10,7 +10,7 @@ import org.atnos.eff.all._
 
 object Output {
 
-  def initialScreen[R: _config : _context : _io]: Eff[R, Unit]= {
+  def initialEntryScreen[R: _config : _context : _io]: Eff[R, Unit]= {
     for {
       context <- get[R, Context]
       config <- ask[R, Config]
@@ -18,6 +18,7 @@ object Output {
       _ <- fromIO(Output.header(context))
       _ <- fromIO(Output.stats(config))
       _ <- fromIO(Output.typeArea(context))
+      _ <- modify(Context.update(ScreenDrawEvent(context.text.text)))
     } yield ()
   }
 

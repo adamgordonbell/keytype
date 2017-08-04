@@ -14,16 +14,21 @@ object Data {
   }
 
 
-  case class Context(text : Text, keys : Seq[TypedKey])
+  case class Context(text : Text, keys : Option[(ScreenDrawEvent,Seq[TypedKey])])
   {
-    //ToDo: make total
-    def toResult() = Result.create(text.text,result(),keys.head.zonedDateTime,keys.last.zonedDateTime)
+    def toResult(): Option[Result] = keys.map { k =>
+      Result.create(
+        text.text,
+        result(),
+        k._1.zonedDateTime,
+        k._2.last.zonedDateTime)
+    }
 
-    def correctKeys(): Seq[TypedKey] = keys.filter(_.correct)
+    def correctKeys(): Seq[TypedKey] = keys.map(_._2.filter(_.correct)).getOrElse(Seq.empty)
 
     def result(): String = correctKeys().collect{case TypedKey(Character(c), _,_) => c}.toList.mkString("")
 
-    val lastkey: Option[TypedKey] = keys.lastOption
+    val lastkey: Option[TypedKey] = keys.flatMap(_._2.lastOption)
 
     val complete = text.text == result()
 
@@ -32,16 +37,21 @@ object Data {
   }
 
   object Context{
-    def update(key : Key)(context : Context) : Context = {
-      context.copy(keys = context.keys :+ TypedKey.create(key, context.expectedKey.getOrElse(' ')))
+    def update(key : KeyPressEvent)(context : Context) : Context = {
+      val (a,ks) = context.keys.get //ToDo make total
+      context.copy(keys = Some((a,ks :+ TypedKey.create(key, context.expectedKey.getOrElse(' ')))))
+    }
+
+    def update(draw : ScreenDrawEvent)(context : Context) : Context = {
+      context.copy(keys = Some((draw,Seq.empty)))
     }
 
     def empty() : Context = {
-      Context(Text.create(""), Seq.empty)
+      Context(Text.create(""), None)
     }
 
     def create(text : Text) : Context = {
-      Context(text, Seq.empty)
+      Context(text, None)
     }
   }
 
