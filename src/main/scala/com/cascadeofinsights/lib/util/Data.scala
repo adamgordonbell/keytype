@@ -13,9 +13,6 @@ object Data {
     val typing = new TypingImp(file)
   }
 
-//  object Config {
-//    def empty() = Config()
-//  }
 
   case class Context(text : Text, keys : Seq[TypedKey])
   {

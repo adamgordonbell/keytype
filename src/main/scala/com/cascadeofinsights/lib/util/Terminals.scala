@@ -10,7 +10,15 @@ import com.googlecode.lanterna.terminal._
 import scala.io.Source
 
 object Terminals {
-  private val terminal = new DefaultTerminalFactory().createTerminal
+  private val terminal = {
+    val f = new DefaultTerminalFactory()
+     f.setForceTextTerminal(true)
+     val term = f.createTerminal
+//    val screen = new TerminalScreen(term)
+//    val gui = new MultiWindowTextGUI(screen)
+//    screen.startScreen()
+    term
+  }
 
 
   def clearScreen: IO[Unit] = IO.primitive(terminal.clearScreen)
