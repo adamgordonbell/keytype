@@ -8,7 +8,7 @@ import scala.util.Random
 
 trait Typing[Text,Result] {
  def nextText() : IO[Text]
- def storeResult(result : Result) : IO[Unit]
+ def storeResults(results : Seq[Result]) : IO[Unit]
  def getResults() : IO[Seq[Result]]
 }
 
@@ -29,8 +29,8 @@ class TypingImp(file : String) extends Typing[Text,Result] {
 
   var results: List[Result] = List.empty
 
-  override def storeResult(result: Result): IO[Unit] = IO.pure{
-    results = result :: results
+  override def storeResults(result: Seq[Result]): IO[Unit] = IO.pure{
+    results = result.toList ::: results
   }
 
   override def getResults(): IO[Seq[Result]] = IO.pure(results)

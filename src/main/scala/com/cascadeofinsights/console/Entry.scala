@@ -45,9 +45,9 @@ object Entry {
   private def results[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
       context <- get[R, Context]
-      result = context.toResult()
+      results = context.toResult()
       config <- ask[R, Config]
-      _ <- fromIO(config.typing.storeResult(result.get))//Todo make total
+      _ <- fromIO(config.typing.storeResults(results))//Todo make total
       _ <- exit
     } yield ()
   }

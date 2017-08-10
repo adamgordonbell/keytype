@@ -16,12 +16,16 @@ object Data {
 
   case class Context(text : Text, keys : Option[(ScreenDrawEvent,Seq[TypedKey])])
   {
-    def toResult(): Option[Result] = keys.map { k =>
-      Result.create(
-        text.text,
-        result(),
-        k._1.zonedDateTime,
-        k._2.last.zonedDateTime)
+    def toResult(): Seq[Result] = {
+      keys.map { k =>
+        val first = k
+//        val l = NonEmptyList[Event](k._1,k._2.map(_.)toList)
+        Result.create(
+          text.text,
+          result(),
+          k._1.zonedDateTime,
+          k._2.last.zonedDateTime)
+        }.toList
     }
 
     def correctKeys(): Seq[TypedKey] = keys.map(_._2.filter(_.correct)).getOrElse(Seq.empty)
