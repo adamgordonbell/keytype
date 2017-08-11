@@ -6,6 +6,10 @@ trait Split {
   def split(t : Text) : Seq[Text]
 }
 
+case class SentinalSplit() extends Split{
+  override def split(t: Text): Seq[Text] = Seq(t)
+}
+
 case class MinSplit(min : Int, on : Regex) extends Split{
   override def split(t: Text): Seq[Text] = {
     def loop(previous : String, remaining : String, minText : List[String] = List.empty): List[String] ={

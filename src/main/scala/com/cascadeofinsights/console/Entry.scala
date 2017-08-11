@@ -15,7 +15,7 @@ object Entry {
   def start[R: _config : _context : _future : _io]: Eff[R, Unit] = {
     for {
       config <- ask[R, Config]
-      word <- fromIO(config.typing.nextText())
+      word <- Eff.pure(config.typing.nextText())
       _ <- put[R, Context](Context.create(word))
       _ <- Output.initialEntryScreen
       _ <- loop
