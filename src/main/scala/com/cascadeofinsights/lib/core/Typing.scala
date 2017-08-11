@@ -13,7 +13,7 @@ trait Typing[Text,Result] {
 }
 
 
-class TypingImp(file : String, splitter : Split = SentinalSplit()) extends Typing[Text,Result] {
+class TypingImp(file : String, splitter : Split = SentinelSplit()) extends Typing[Text,Result] {
   lazy val lines: List[String] = {
     Source.fromFile(file).getLines.toList
   }

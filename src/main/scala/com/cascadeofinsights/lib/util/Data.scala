@@ -10,7 +10,10 @@ import scala.util.Try
 object Data {
 
   case class Config(file : String){
-    val typing = new TypingImp(file, MinSplit(50,"\\s".r))
+    val typing = new TypingImp(
+      file,
+      CompositeSplit(List(MinSplit(50,"\\s".r),MaxSplit(100,"\\w".r)))
+    )
   }
 
 
